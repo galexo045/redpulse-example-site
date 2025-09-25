@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import { User } from '../types';
 import { apiService } from '../services/apiService';
@@ -7,6 +8,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<User | null>;
   logout: () => void;
   register: (userData: Omit<User, 'id' | 'donations'> & { password: string }) => Promise<User>;
+  updateUser: (userData: Partial<User & { currentPassword?: string, newPassword?: string }>) => Promise<User>;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -71,7 +73,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const value = { currentUser, login, logout, register, loading, error, isAuthenticated: !!currentUser };
+  const updateUser = useCallback(async (userData: Partial<User & { currentPassword?: string, newPassword?: string }>) => {
+    if (!currentUser) {
+        throw new Error("No user is currently logged in.");
+    }
+    setLoading(true);
+    setError(null);
+    try {
+        const updatedUser = await apiService.updateUser(currentUser.id, userData);
+        setCurrentUser(updatedUser);
+        return updatedUser;
+    } catch (e) {
+        setError(e instanceof Error ? e.message : 'An unknown error occurred.');
+        throw e;
+    } finally {
+        setLoading(false);
+    }
+  }, [currentUser]);
+
+  const value = { currentUser, login, logout, register, updateUser, loading, error, isAuthenticated: !!currentUser };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,4 +1,3 @@
-
 export enum BloodGroup {
   APositive = 'A+',
   ANegative = 'A-',
@@ -53,4 +52,5 @@ export interface BloodRequest {
   urgency: 'Low' | 'Medium' | 'High';
   status: 'Open' | 'Matched' | 'Closed';
   createdAt: Date;
+  matchedDonorId?: string;
 }

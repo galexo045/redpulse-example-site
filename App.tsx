@@ -10,6 +10,7 @@ import ProfilePage from './pages/ProfilePage';
 import NewRequestPage from './pages/NewRequestPage';
 import RequestDetailsPage from './pages/RequestDetailsPage';
 import ChatPage from './pages/ChatPage';
+import SettingsPage from './pages/SettingsPage';
 
 const App: React.FC = () => {
   return (
@@ -35,6 +36,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/login" element={currentUser ? <Navigate to="/dashboard" /> : <LoginPage />} />
       <Route path="/dashboard" element={currentUser ? <DashboardPage /> : <Navigate to="/login" />} />
       <Route path="/profile" element={currentUser ? <ProfilePage /> : <Navigate to="/login" />} />
+      <Route path="/settings" element={currentUser ? <SettingsPage /> : <Navigate to="/login" />} />
       <Route path="/request/new" element={currentUser ? <NewRequestPage /> : <Navigate to="/login" />} />
       <Route path="/request/:id" element={<RequestDetailsPage />} />
       <Route path="/chat/:userId" element={currentUser ? <ChatPage /> : <Navigate to="/login" />} />

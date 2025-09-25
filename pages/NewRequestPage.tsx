@@ -30,7 +30,7 @@ const NewRequestPage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const newRequestData: Omit<BloodRequest, 'id' | 'createdAt' | 'status'> = {
+      const newRequestData: Omit<BloodRequest, 'id' | 'createdAt' | 'status' | 'matchedDonorId'> = {
         requestorId: currentUser.id,
         patientName,
         bloodGroup,

@@ -40,6 +40,8 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const inputClass = "mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-brand-dark text-white placeholder-gray-400";
+
   return (
     <div className="max-w-md mx-auto mt-10">
       <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
@@ -65,49 +67,49 @@ const LoginPage: React.FC = () => {
              <>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                <input type="text" value={name} onChange={e => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" />
+                <input type="text" value={name} onChange={e => setName(e.target.value)} required className={inputClass} />
               </div>
              </>
           )}
           <div>
             <label className="block text-sm font-medium text-gray-700">Email Address</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className={inputClass} />
           </div>
            <div>
             <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className={inputClass} />
           </div>
           {!isLogin && (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" />
+                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className={inputClass} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" />
+                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} required className={inputClass} />
               </div>
                <div>
                 <label className="block text-sm font-medium text-gray-700">Locality</label>
-                <input type="text" value={locality} onChange={e => setLocality(e.target.value)} required placeholder="e.g., Downtown" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" />
+                <input type="text" value={locality} onChange={e => setLocality(e.target.value)} required placeholder="e.g., Downtown" className={inputClass} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Blood Group</label>
-                  <select value={bloodGroup} onChange={e => setBloodGroup(e.target.value as BloodGroup)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red">
+                  <select value={bloodGroup} onChange={e => setBloodGroup(e.target.value as BloodGroup)} className={inputClass}>
                     {BLOOD_GROUPS.map(bg => <option key={bg} value={bg}>{bg}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Sex</label>
-                  <select value={sex} onChange={e => setSex(e.target.value as Sex)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red">
+                  <select value={sex} onChange={e => setSex(e.target.value as Sex)} className={inputClass}>
                     {SEX_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">I want to be a</label>
-                <select value={role} onChange={e => setRole(e.target.value as UserRole)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red">
+                <select value={role} onChange={e => setRole(e.target.value as UserRole)} className={inputClass}>
                   {USER_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
               </div>

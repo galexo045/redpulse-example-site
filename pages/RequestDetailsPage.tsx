@@ -111,24 +111,62 @@ const RequestDetailsPage: React.FC = () => {
                 </div>
             )}
 
-            {isVolunteer && !isOwner && request.status === 'Open' && (
+            {isVolunteer && !isOwner && (
                 <div className="mt-8 pt-6 border-t border-gray-200">
-                    <h2 className="text-2xl font-semibold mb-4 text-brand-dark">Ready to Help?</h2>
-                    <p className="text-gray-600 mb-6">You are a potential match for this request. Please contact the requestor for coordination or accept the request to notify them of your willingness to donate.</p>
-                    <div className="flex items-center space-x-4">
-                        <button 
-                            onClick={handleAcceptRequest}
-                            className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition-transform transform hover:scale-105"
-                        >
-                            Accept Request
-                        </button>
-                        <Link 
-                            to={`/chat/${request.requestorId}`}
-                            className="px-6 py-3 bg-brand-blue text-white font-semibold rounded-lg shadow-md hover:bg-blue-800 transition-transform transform hover:scale-105 text-center"
-                        >
-                            Contact Requestor
-                        </Link>
-                    </div>
+                    {/* Case 1: Request is Open */}
+                    {request.status === 'Open' && (
+                        <>
+                            <h2 className="text-2xl font-semibold mb-4 text-brand-dark">Ready to Help?</h2>
+                            <p className="text-gray-600 mb-6">You are a potential match for this request. Please contact the requestor for coordination or accept the request to notify them of your willingness to donate.</p>
+                            <div className="flex items-center space-x-4">
+                                <button 
+                                    onClick={handleAcceptRequest}
+                                    className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition-transform transform hover:scale-105"
+                                >
+                                    Accept Request
+                                </button>
+                                <Link 
+                                    to={`/chat/${request.requestorId}`}
+                                    className="px-6 py-3 bg-brand-blue text-white font-semibold rounded-lg shadow-md hover:bg-blue-800 transition-transform transform hover:scale-105 text-center"
+                                >
+                                    Contact Requestor
+                                </Link>
+                            </div>
+                        </>
+                    )}
+
+                    {/* Case 2: Request is Matched */}
+                    {request.status === 'Matched' && (
+                        <>
+                            {/* Subcase 2a: Current user is the matched donor */}
+                            {request.matchedDonorId === currentUser?.id ? (
+                                <>
+                                    <h2 className="text-2xl font-semibold mb-4 text-green-600">You've Pledged to Donate!</h2>
+                                    <p className="text-gray-600 mb-6">Thank you for accepting this request! Please coordinate with the requestor for the next steps to complete your life-saving donation.</p>
+                                    <Link 
+                                        to={`/chat/${request.requestorId}`}
+                                        className="inline-block px-6 py-3 bg-brand-blue text-white font-semibold rounded-lg shadow-md hover:bg-blue-800 transition-transform transform hover:scale-105 text-center"
+                                    >
+                                        Contact Requestor
+                                    </Link>
+                                </>
+                            ) : (
+                            /* Subcase 2b: Matched by someone else */
+                                <>
+                                    <h2 className="text-2xl font-semibold mb-4 text-brand-dark">Request Matched</h2>
+                                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg border">This request has already been matched with another volunteer. Thank you for your willingness to help.</p>
+                                </>
+                            )}
+                        </>
+                    )}
+
+                    {/* Case 3: Request is Closed */}
+                    {request.status === 'Closed' && (
+                        <>
+                            <h2 className="text-2xl font-semibold mb-4 text-brand-dark">Request Closed</h2>
+                            <p className="text-gray-600 bg-gray-50 p-4 rounded-lg border">This request has been closed by the requestor.</p>
+                        </>
+                    )}
                 </div>
             )}
         </div>

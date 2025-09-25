@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { apiService } from '../services/apiService';
-import { BloodRequest, UserRole } from '../types';
+import { BloodRequest, UserRole, Donation } from '../types';
 import RequestCard from '../components/RequestCard';
 import { Link } from 'react-router-dom';
 import DonationCooldownTimer from '../components/DonationCooldownTimer';
 import Notification from '../components/Notification';
+import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 
 const DashboardPage: React.FC = () => {
   const { currentUser } = useAuth();
   const [requests, setRequests] = useState<BloodRequest[]>([]);
+  const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState<BloodRequest | null>(null);
 
   useEffect(() => {
     const requestCreated = sessionStorage.getItem('requestCreated');
@@ -23,14 +27,27 @@ const DashboardPage: React.FC = () => {
         sessionStorage.removeItem('requestCreated');
     }
 
-    const fetchRequests = async () => {
+    const fetchData = async () => {
+      if (!currentUser) {
+        setRequests([]);
+        setDonations([]);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
-      const allRequests = await apiService.getRequests();
+      const [allRequests, userDonations] = await Promise.all([
+        apiService.getRequests(),
+        (currentUser.role === UserRole.Volunteer || currentUser.role === UserRole.Both)
+          ? apiService.getDonationsByUserId(currentUser.id)
+          : Promise.resolve([])
+      ]);
+      
       setRequests(allRequests);
+      setDonations(userDonations);
       setLoading(false);
     };
-    fetchRequests();
-  }, []);
+    fetchData();
+  }, [currentUser]);
   
   const isVolunteer = currentUser?.role === UserRole.Volunteer || currentUser?.role === UserRole.Both;
   const isRequestor = currentUser?.role === UserRole.Requestor || currentUser?.role === UserRole.Both;
@@ -45,11 +62,45 @@ const DashboardPage: React.FC = () => {
     return requests.filter(req => req.bloodGroup === currentUser.bloodGroup && req.locality === currentUser.locality && req.status === 'Open');
   }, [requests, currentUser, isVolunteer]);
 
+  const acceptedRequests = useMemo(() => {
+    if (!isVolunteer) return [];
+    const acceptedRequestIds = new Set(donations.map(d => d.requestId));
+    return requests.filter(req => acceptedRequestIds.has(req.id));
+  }, [requests, donations, isVolunteer]);
+
+  const handleOpenDeleteModal = (request: BloodRequest) => {
+    setRequestToDelete(request);
+    setIsDeleteModalOpen(true);
+  };
+  
+  const handleCloseDeleteModal = () => {
+    setRequestToDelete(null);
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!requestToDelete) return;
+    try {
+      await apiService.deleteRequest(requestToDelete.id);
+      setRequests(prev => prev.filter(r => r.id !== requestToDelete.id));
+      setNotification({ message: 'Request successfully deleted.', type: 'success' });
+    } catch (error) {
+      console.error('Failed to delete request', error);
+      setNotification({ message: 'Failed to delete request. Please try again.', type: 'error' });
+    } finally {
+      handleCloseDeleteModal();
+    }
+  };
 
   if (!currentUser) return null;
 
   return (
     <div>
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
       {notification && <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
       <h1 className="text-3xl font-bold text-brand-dark mb-6">Welcome, {currentUser.name}!</h1>
 
@@ -70,6 +121,19 @@ const DashboardPage: React.FC = () => {
                             )
                         )}
                     </div>
+
+                    <div>
+                        <h2 className="text-2xl font-semibold mb-4 border-b-2 border-brand-red pb-2">Your Accepted Donations</h2>
+                         {loading ? <p>Loading your accepted donations...</p> : (
+                            acceptedRequests.length > 0 ? (
+                                <div className="space-y-4">
+                                    {acceptedRequests.map(req => <RequestCard key={req.id} request={req} />)}
+                                </div>
+                            ) : (
+                                <p className="text-gray-600 bg-white p-4 rounded-lg border">You have not accepted any requests yet. Find a matching request to help!</p>
+                            )
+                        )}
+                    </div>
                 </div>
             )}
              {isRequestor && (
@@ -83,7 +147,13 @@ const DashboardPage: React.FC = () => {
                     {loading ? <p>Loading your requests...</p> : (
                         myRequests.length > 0 ? (
                             <div className="space-y-4">
-                                {myRequests.map(req => <RequestCard key={req.id} request={req} />)}
+                                {myRequests.map(req => (
+                                    <RequestCard 
+                                        key={req.id} 
+                                        request={req}
+                                        onDelete={() => handleOpenDeleteModal(req)}
+                                    />
+                                ))}
                             </div>
                         ) : (
                             <p className="text-gray-600 bg-white p-4 rounded-lg border">You haven't made any requests yet.</p>

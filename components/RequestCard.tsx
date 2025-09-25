@@ -5,9 +5,10 @@ import { BloodRequest } from '../types';
 
 interface RequestCardProps {
   request: BloodRequest;
+  onDelete?: () => void;
 }
 
-const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
+const RequestCard: React.FC<RequestCardProps> = ({ request, onDelete }) => {
   const timeSince = (date: Date): string => {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
     let interval = seconds / 31536000;
@@ -51,13 +52,24 @@ const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
         </p>
         <div className="flex justify-between items-center">
           <p className="text-sm text-gray-500">{timeSince(request.createdAt)}</p>
-          <Link
-            to={`/request/${request.id}`}
-            className="inline-flex items-center px-4 py-2 bg-brand-red text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition"
-          >
-            View Details
-            <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
-          </Link>
+          <div className="flex items-center space-x-2">
+            {onDelete && (
+               <button
+                  onClick={onDelete}
+                  className="px-3 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-md hover:bg-red-100 transition"
+                  aria-label={`Delete request for ${request.patientName}`}
+                >
+                  DELETE
+                </button>
+            )}
+            <Link
+              to={`/request/${request.id}`}
+              className="inline-flex items-center px-4 py-2 bg-brand-red text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition"
+            >
+              View Details
+              <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
