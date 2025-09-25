@@ -1,0 +1,5 @@
+{
+  "name": "Copy of RedPulse",
+  "description": "A web application for connecting blood donors with those in need. Requestors can post needs, and volunteers can find opportunities to donate based on location and blood type, earning rewards for their contributions.",
+  "requestFramePermissions": []
+}
